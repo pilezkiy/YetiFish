@@ -1,0 +1,13 @@
+#yetifish_menu_icon, .yetifish_menu_icon {
+	background:none!important;
+	background-image:url(images/yeti_fish_icon.png)!important;
+	background-repeat:no-repeat!important;
+}
+
+.yetifish_menu_icon{
+	background-position: center center!important;
+}
+
+#yf-request-result{
+	margin-top:30px;
+}

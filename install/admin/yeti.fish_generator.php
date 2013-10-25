@@ -1,0 +1,1 @@
+<?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/yeti.fish/admin/yeti.fish_generator.php");?>
