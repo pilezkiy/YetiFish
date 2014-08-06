@@ -21,9 +21,8 @@ require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_aft
 if(!empty($_REQUEST["YF_OPTIONS_SAVE"]))
 {
 	COption::SetOptionString($MID,"FLICKR_APIKEY",$_REQUEST["FLICKR_APIKEY"]);
+	COption::SetOptionString("main","translate_key_yandex",$_REQUEST["YANDEX_APIKEY"]);
 }
-
-
 ?>
 <form name="find_form" method="POST" action="<?echo $APPLICATION->GetCurPage()?>?">
 <?=bitrix_sessid_post()?>
@@ -113,8 +112,14 @@ if(CModule::IncludeModule("iblock"))
 					<option value="en"><?=GetMessage("YETIFISH_LANG_EN")?></option>
 					<option value="de"><?=GetMessage("YETIFISH_LANG_DE")?></option>
 				</select>
-				<label><input type="radio" name="TRANSLATE_SERVICE" value="yandex" checked="checked" />&nbsp;<?=GetMessage("YF_YANDEX_TRANSLATE")?></label>
-				<label><input type="radio" name="TRANSLATE_SERVICE" value="google"/>&nbsp;<?=GetMessage("YF_GOOGLE_TRANSLATE")?></label>
+				<label><input type="radio" name="TRANSLATE_SERVICE" value="google" checked="checked" />&nbsp;<?=GetMessage("YF_GOOGLE_TRANSLATE")?></label>
+				<?
+				$key = COption::GetOptionString("main","translate_key_yandex");
+				if(!empty($key))
+				{
+					?><label><input type="radio" name="TRANSLATE_SERVICE" value="yandex"  />&nbsp;<?=GetMessage("YF_YANDEX_TRANSLATE")?></label><?
+				}
+				?>
 			</td>
 		</tr>
 		<tr>
@@ -157,6 +162,15 @@ $tabControl->BeginNextTab();
 			$apiKey = COption::GetOptionString($MID,"FLICKR_APIKEY");
 			?>
 			<input name="FLICKR_APIKEY" value="<?=$apiKey?>" size="50"/>
+			</td>
+		</tr>
+		<tr>
+			<td><label><?=GetMessage("YF_YANDEX_APIKEY")?>:</label></td>
+			<td>
+			<?
+			$apiKey = COption::GetOptionString("main","translate_key_yandex");
+			?>
+			<input name="YANDEX_APIKEY" value="<?=$apiKey?>" size="50"/>
 			</td>
 		</tr>
 	</table>

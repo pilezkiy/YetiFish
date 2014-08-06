@@ -5,22 +5,22 @@ class CYetiFishGenerator
 	private static $flickr_api_key = "09a0ea92182a4f5d5c56b80e0b634710";
 	
 	public static $yaLinks = array(
-		"astronomy" => "http://vesna.yandex.ru/astronomy.xml",
-		"geology" => "http://vesna.yandex.ru/geology.xml",
-		"gyroscope" => "http://vesna.yandex.ru/gyroscope.xml",
-		"literature" => "http://vesna.yandex.ru/literature.xml",
-		"marketing" => "http://vesna.yandex.ru/marketing.xml",
-		"mathematics" => "http://vesna.yandex.ru/mathematics.xml",
-		"music" => "http://vesna.yandex.ru/music.xml",
-		"polit" => "http://vesna.yandex.ru/polit.xml",
-		"agrobiologia" => "http://vesna.yandex.ru/agrobiologia.xml",
-		"law" => "http://vesna.yandex.ru/law.xml",
-		"psychology" => "http://vesna.yandex.ru/psychology.xml",
-		"geography" => "http://vesna.yandex.ru/geography.xml",
-		"physics" => "http://vesna.yandex.ru/physics.xml",
-		"philosophy" => "http://vesna.yandex.ru/philosophy.xml",
-		"chemistry" => "http://vesna.yandex.ru/chemistry.xml",
-		"estetica" => "http://vesna.yandex.ru/estetica.xml",
+		"astronomy" => "http://referats.yandex.ru/referats/write/?t=astronomy",
+		"geology" => "http://referats.yandex.ru/referats/write/?t=geology",
+		"gyroscope" => "http://referats.yandex.ru/referats/write/?t=gyroscope",
+		"literature" => "http://referats.yandex.ru/referats/write/?t=literature",
+		"marketing" => "http://referats.yandex.ru/referats/write/?t=marketing",
+		"mathematics" => "http://referats.yandex.ru/referats/write/?t=mathematics",
+		"music" => "http://referats.yandex.ru/referats/write/?t=music",
+		"polit" => "http://referats.yandex.ru/referats/write/?t=polit",
+		"agrobiologia" => "http://referats.yandex.ru/referats/write/?t=agrobiologia",
+		"law" => "http://referats.yandex.ru/law.xml",
+		"psychology" => "http://referats.yandex.ru/psychology.xml",
+		"geography" => "http://referats.yandex.ru/geography.xml",
+		"physics" => "http://referats.yandex.ru/physics.xml",
+		"philosophy" => "http://referats.yandex.ru/philosophy.xml",
+		"chemistry" => "http://referats.yandex.ru/chemistry.xml",
+		"estetica" => "http://referats.yandex.ru/estetica.xml",
 	);
 	
 	public static function getRandomFlickrPhoto($tags = "")
@@ -34,8 +34,7 @@ class CYetiFishGenerator
 		$api_key = COption::GetOptionString(self::$MID,"FLICKR_APIKEY");
 		if(empty($api_key))$api_key = self::$flickr_api_key;
 		
-		
-		$flickrApiUrl = "http://api.flickr.com/services/rest/?method=flickr.photos.search".
+		$flickrApiUrl = "https://api.flickr.com/services/rest/?method=flickr.photos.search".
 			"&api_key=".$api_key.
 			"&tags=".$tagsParam.
 			"&tag_mode=all".
@@ -65,7 +64,7 @@ class CYetiFishGenerator
 			n	small, 320 on longest side
 			-	medium, 500 on longest side
 			z	medium 640, 640 on longest side
-			c	medium 800, 800 on longest side†
+			c	medium 800, 800 on longest side?
 			b	large, 1024 on longest side*
 			o	original image, either a jpg, gif or png, depending on source format
 			*/
@@ -113,6 +112,7 @@ class CYetiFishGenerator
 		
 		if(class_exists("DOMDocument"))
 		{
+			$xmlStr = '<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head>'.$xmlStr;
 			$xml = new DOMDocument();
 			$xml->loadHTML($xmlStr);
 			
@@ -127,7 +127,7 @@ class CYetiFishGenerator
 			}
 			
 			$arResult["TITLE"] = "";
-			foreach($xml->getElementsByTagName("h1") as $h1)
+			foreach($xml->getElementsByTagName("strong") as $h1)
 			{
 				$txt = $h1->nodeValue;
 				if(preg_match("#".$qlChar."(.+)".$qrChar."#i",$txt,$m))
@@ -139,7 +139,7 @@ class CYetiFishGenerator
 		else
 		{
 			$arResult["TITLE"] = "";
-			preg_match("/<h1[^>]*>([^<]*)<\/h1>/us",$xmlStr,$matches);
+			preg_match("/<strong[^>]*>([^<]*)<\/strong>/us",$xmlStr,$matches);
 			if($matches[1])
 			{
 				list($tmp,$title) = explode(":",$matches[1],2);
@@ -163,14 +163,15 @@ class CYetiFishGenerator
 				$i++;
 			}
 		}
-		
 		return $arResult;
 	}
 	
 	public static function yaTranslate($sText, $sLang="ru", $tLang="en")
 	{
+		$key = COption::GetOptionString("main","translate_key_yandex");
+		if(empty($key)) return false;
 		$sText = rawurlencode($sText);
-		$str = file_get_contents("http://translate.yandex.net/api/v1/tr.json/translate?lang=".$sLang."-".$tLang."&text=".$sText);
+		$str = file_get_contents("https://translate.yandex.net/api/v1.5/tr.json/translate?lang=".$sLang."-".$tLang."&text=".$sText."&key=".$key);
 		$text = json_decode($str);
 		$text = array_pop($text->text);
 		return $text;
@@ -207,7 +208,7 @@ class CYetiFishGenerator
 	function addNews($IBLOCK_ID,$count = 5,$themeCode = "marketing",$lang = "ru", $translateService = "yandex", $randomSection = true, $photoTags = "", $setDetailPhoto = false, $setPreviewPhoto = false, $separatePhoto = false)
 	{
 		$arResult = array("ITEMS"=>array());
-	
+		
 		if(CModule::IncludeModule("iblock"))
 		{
 			$IBLOCK_ID = intval($IBLOCK_ID);
@@ -238,6 +239,7 @@ class CYetiFishGenerator
 					
 					// translate
 					$newsTexts = self::getNewsTexts($themeCode);
+					
 					if($lang != "ru")
 					{
 						switch($translateService)
@@ -267,7 +269,7 @@ class CYetiFishGenerator
 						"IBLOCK_SECTION_ID" => $sid,
 						"IBLOCK_ID"      => $IBLOCK_ID,  
 						"NAME"           => $newsTexts["TITLE"],  
-						"ACTIVE"         => "Y",// àêòèâåí  
+						"ACTIVE"         => "Y",// ???????  
 						"ACTIVE_FROM"	=> date("d.m.Y H:i:s"),
 						"PREVIEW_TEXT"   => $newsTexts["TEXT"][0],
 						"PREVIEW_TEXT_TYPE" =>"text",

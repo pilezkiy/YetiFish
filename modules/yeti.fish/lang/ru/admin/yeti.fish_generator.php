@@ -41,4 +41,5 @@ $MESS["YF_YANDEX_TRANSLATE"] = "Яндекс.Перевод";
 $MESS["YF_GOOGLE_TRANSLATE"] = "Google.Translate";
 $MESS["YF_OPT_SAVE"] = "Сохранить";
 $MESS["YF_FLICKR_APIKEY"] = "ApiKey для сервиса Flickr";
+$MESS["YF_YANDEX_APIKEY"] = "ApiKey для сервиса Яндекс.Перевод";
 ?>
